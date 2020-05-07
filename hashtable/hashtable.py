@@ -67,18 +67,33 @@ class HashTable:
         Implement this.
         self.buckets = [None] * self.capacity
         """
+        load = self.storage / self.capacity
+        load_factor = 0.7
+
+        if load > load_factor:
+            self.capacity = self.capacity * 2
+            self.resize()
+
         self.storage += 1
         index = self.hash_index(key)
+        # print(index, key)
         node = self.hash_table[index]
         if node is None:
-           self.hash_table[index] = HashTableEntry(key,value)
-           return 
+            # print(key, value, index, self.capacity)
+            self.hash_table[index] = HashTableEntry(key,value)
+            return 
         
         cur = node
-        while cur.next is not None:
+        prev = None
+        while cur is not None:
+            if cur.key == key:
+                # print("UPDATE", key, value, cur.value)
+                cur.value = value
+                return
+            prev = cur
             cur = cur.next
 
-        cur.next = HashTableEntry(key,value)
+        prev.next = HashTableEntry(key,value)
 
 
 
@@ -90,6 +105,13 @@ class HashTable:
 
         Implement this.
         """
+        load = self.storage / self.capacity
+        load_factor = 0.2
+
+        if load < load_factor:
+            self.capacity = self.capacity // 2
+            self.desize()
+
         index = self.hash_index(key)
         node = self.hash_table[index]
 
@@ -117,9 +139,13 @@ class HashTable:
         while node is not None and node.key != key:
             node = node.next
         if node is None:
+            # print('EMPTY', key, index, self.capacity)
             return None
         else: 
+            # print("RETURN", node.value)
             return node.value
+
+
 
     def resize(self):
         """
@@ -127,7 +153,56 @@ class HashTable:
         rehash all key/value pairs.
 
         Implement this.
+
+        Load = size/capacity
         """
+        #  load = self.storage / self.capacity
+        # load_factor = 0.7
+
+        # if load > load_factor:
+        #     self.capacity = self.capacity * 2
+        #     self.resize()
+    
+        hash_table = self.hash_table
+        new_array = [None] * self.capacity
+        self.hash_table = new_array
+        self.storage = 0
+
+
+        print("LOOKHERE")
+        for element in hash_table:
+                node = element
+                while node is not None:
+                    self.put(node.key,node.value)
+                    node = node.next
+        print(self.hash_table)
+        print("UPDATEFINISHED")           
+
+        
+
+    def desize(self):
+
+        hash_table = self.hash_table
+        new_array = [None] * self.capacity
+        self.hash_table = new_array
+        self.storage = 0
+
+
+        print("LOOKHERE")
+        for element in hash_table:
+                node = element
+                while node is not None:
+                    self.put(node.key,node.value)
+                    node = node.next
+        print(self.hash_table)
+        print("UPDATEFINISHED")           
+
+                        
+
+
+
+
+
 
 if __name__ == "__main__":
     ht = HashTable(2)
@@ -150,9 +225,9 @@ if __name__ == "__main__":
 
     print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
-    # Test if data intact after resizing
-    # print(ht.get("line_1"))
-    # print(ht.get("line_2"))
-    # print(ht.get("line_3"))
+    #Test if data intact after resizing
+    print(ht.get("line_1"))
+    print(ht.get("line_2"))
+    print(ht.get("line_3"))
 
-    # print("")
+    print("")
